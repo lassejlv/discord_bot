@@ -5,6 +5,9 @@ const env = createEnv({
   server: {
     TOKEN: z.string(),
     PREFIX: z.string(),
+    NODE_ENV: z.enum(["development", "production"]),
+    TURSO_URL: z.string(),
+    TURSO_TOKEN: z.string()
   },
   runtimeEnv: process.env
 })

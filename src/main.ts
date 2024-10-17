@@ -2,6 +2,7 @@ import { Client } from "discord.js";
 import env from "./lib/env";
 import logger from "./lib/logger";
 import loadCommands from "./lib/load";
+import { prisma } from "./lib/prisma";
 
 const commands = await loadCommands();
 
@@ -25,14 +26,15 @@ client.on("messageCreate", async (message) => {
   const cmd = commands.get(command)
   if (!cmd) return;
 
-  await message.channel.sendTyping();
-
-
   try {
-    cmd.run({ message, args })
-  } catch (error) {
-    logger.error(error);
-    message.reply("An error occured while executing this command");
+
+    const user = await prisma.user.findUnique({ where: { discordId: message.author.id } });
+    if (!user && cmd.details.name !== "accept") throw new Error("please run the accept command first");
+
+    cmd.run({ message, args, prisma })
+  } catch (error: any) {
+    logger.error(error.message);
+    message.reply(`error: ${error.message}`);
   }
 })
 
