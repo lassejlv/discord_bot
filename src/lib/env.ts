@@ -7,7 +7,9 @@ const env = createEnv({
     PREFIX: z.string(),
     NODE_ENV: z.enum(["development", "production"]),
     TURSO_URL: z.string(),
-    TURSO_TOKEN: z.string()
+    TURSO_TOKEN: z.string(),
+    REDIS_URL: z.string(),
+    DEVELOPER_ID: z.string()
   },
   runtimeEnv: process.env
 })

@@ -2,7 +2,9 @@ import { Client } from "discord.js";
 import env from "./lib/env";
 import logger from "./lib/logger";
 import loadCommands from "./lib/load";
-import { prisma } from "./lib/prisma";
+import prisma from "./lib/prisma";
+import redis from "./lib/redis";
+import type { User } from "@prisma/client";
 
 const commands = await loadCommands();
 
@@ -17,6 +19,7 @@ client.once("ready", (c) => {
   logger.info(`logged in as ${c.user.tag}`)
 })
 
+
 client.on("messageCreate", async (message) => {
 
   if (!message.content.startsWith(env.PREFIX)) return;
@@ -28,12 +31,21 @@ client.on("messageCreate", async (message) => {
 
   try {
 
-    const user = await prisma.user.findUnique({ where: { discordId: message.author.id } });
-    if (!user && cmd.details.name !== "accept") throw new Error("please run the accept command first");
+    let userData: User | null;
 
-    cmd.run({ message, args, prisma })
+    const isCached = await redis.get(`user:${message.author.id}`);
+
+    if (isCached) {
+      userData = JSON.parse(isCached)
+    } else {
+      userData = await prisma.user.findUnique({ where: { discordId: message.author.id } });
+    }
+
+    if (!userData && cmd.details.name !== "accept") throw new Error("please run the accept command first");
+    if (userData && cmd.details.name === "accept") throw new Error("you have already accepted the terms of service")
+
+    cmd.run({ message, args, prisma, redis, env })
   } catch (error: any) {
-    logger.error(error.message);
     message.reply(`error: ${error.message}`);
   }
 })
