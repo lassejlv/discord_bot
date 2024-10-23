@@ -4,7 +4,8 @@ WORKDIR /app
 COPY . .
 
 RUN bun install
-RUN bun build --compile src/main.ts --outfile bot
-RUN bunx prisma generate
+
+## Includes lint, build and prisma generate
+RUN bun run build 
 
 CMD ["./bot"]

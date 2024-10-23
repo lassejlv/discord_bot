@@ -15,7 +15,7 @@ export default defineCommand({
     if (message.author.id !== env.DEVELOPER_ID) return;
 
     switch (subcommand) {
-      case "reload":
+      case "reload": {
         await redis.flushall();
         const users = await prisma.user.findMany();
 
@@ -25,6 +25,7 @@ export default defineCommand({
 
         await message.reply("Cache has ben reloaded.")
         break;
+      }
       default:
         await message.reply("Invalid subcommand")
     }

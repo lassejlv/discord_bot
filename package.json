@@ -4,11 +4,19 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/main.ts",
+    "lint": "bunx eslint --fix src/**/*.ts",
+    "build": "bun lint && bunx prisma generate && bun build --compile src/main.ts --outfile bot",
     "migrate": "prisma migrate dev && bun src/lib/migrate.ts"
   },
   "devDependencies": {
+    "@eslint/js": "^9.13.0",
     "@types/bun": "latest",
-    "prisma": "^5.21.1"
+    "eslint": "^9.12.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^15.11.0",
+    "prisma": "^5.21.1",
+    "typescript-eslint": "^8.10.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
